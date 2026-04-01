@@ -1,0 +1,4 @@
+interface:
+  display_name: "ArXiv Paper Archiver"
+  short_description: "Find hot papers, archive arXiv PDFs, and prepare Chinese research outputs"
+  default_prompt: "Find top-N hot papers for a research topic, search arXiv, archive PDFs and metadata, run OCR when needed, and prepare Chinese summaries or full Chinese translations."
