@@ -31,7 +31,7 @@ def main() -> None:
     if not paper:
         raise SystemExit(f"Unable to find arXiv paper: {args.arxiv_id}")
 
-    archive_root = paper_archive_dir(args.archive_dir, paper.arxiv_id)
+    archive_root = paper_archive_dir(args.archive_dir, paper.arxiv_id, title=paper.title)
     safe_mkdir(archive_root)
 
     pdf_output = pdf_path(args.archive_dir, paper.arxiv_id, paper.title)
@@ -40,7 +40,7 @@ def main() -> None:
 
         download_file(paper.pdf_url, pdf_output)
 
-    source_output = extracted_text_path(args.archive_dir, paper.arxiv_id)
+    source_output = extracted_text_path(args.archive_dir, paper.arxiv_id, title=paper.title)
     extracted_text = source_output.read_text() if source_output.exists() else ""
     if not extracted_text:
         extracted_text = extract_text_from_pdf(pdf_output)
@@ -67,7 +67,7 @@ def main() -> None:
             "ocr_status": "not_run",
         }
     )
-    write_json(metadata_path(args.archive_dir, paper.arxiv_id), metadata)
+    write_json(metadata_path(args.archive_dir, paper.arxiv_id, title=paper.title), metadata)
     print(json.dumps(metadata, ensure_ascii=False, indent=2))
 
 

@@ -5,7 +5,7 @@ description: Search arXiv by topic or keyword, discover top-N hot papers for an 
 
 # ArXiv Paper Archiver
 
-Archive arXiv papers into a stable local directory layout, keep the original PDF using the paper's English title as the filename, and treat the paper title as the archive name from the user's point of view rather than using the arXiv ID as the visible archive label. Run GLM-OCR on the archived PDF when higher-fidelity document parsing is needed, discover the hottest papers for a research topic, then use the current Claude Code or Codex session model to generate a Chinese summary and an optional full Chinese translation. Chinese translations must include the paper's figures and charts as renderable Markdown assets whenever OCR placeholders or figure regions are available. Use the bundled scripts for search, hot-paper discovery, archive, OCR, and prompt/context preparation.
+Archive arXiv papers into a stable local directory layout, keep the original PDF using the paper's English title as the filename, and treat the paper title as the archive name from the user's point of view rather than using the arXiv ID as the visible archive label. Run GLM-OCR on the archived PDF before paper translation work so the agent works from a structured document source instead of translating from its own memory or rough PDF text extraction. Discover the hottest papers for a research topic, then use the current Claude Code or Codex session model to generate a Chinese summary and an optional full Chinese translation. Chinese translations must include the paper's figures and charts as renderable Markdown assets whenever OCR placeholders or figure regions are available. Use the bundled scripts for search, hot-paper discovery, archive, OCR, and prompt/context preparation.
 
 ## Core Capabilities
 
@@ -17,6 +17,7 @@ This skill gives the current AI agent a reusable paper-processing workflow with 
 - Keep the original paper PDF under the archive folder using the paper's English title as the filename.
 - Present archived papers to users by paper title, not by arXiv ID.
 - Run GLM-OCR on the archived PDF so the agent can work from layout-aware Markdown instead of plain text extraction.
+- Require OCR as the default prerequisite for full-paper translation; do not rely on the model to freestyle or reconstruct the paper directly from the raw PDF or from memory.
 - Prepare `.context.md` and `.prompt.md` packets so the current Claude Code or Codex session can write high-quality Chinese summaries and translations without embedding all workflow logic in the prompt.
 - Prefer OCR output over plain extracted text when generating downstream summary or translation context.
 - Render OCR figure placeholders into real PNG assets and a Markdown copy that VS Code or Obsidian can preview with inline images.
@@ -42,7 +43,7 @@ Run the workflow in this order:
 1. Search papers with `scripts/search_arxiv.py`, or find a hot list with `scripts/find_hot_papers.py`.
 2. Pick an `arxiv_id` from the results.
 3. Archive the paper with `scripts/archive_paper.py`.
-4. When you need better handling for figures, formulas, tables, and layout, run `scripts/ocr_paper.py` on the archived PDF.
+4. Before translating a paper, run `scripts/ocr_paper.py` on the archived PDF so the translation is grounded in OCR output.
 5. Generate the Chinese summary with the current session model, or run `scripts/summarize_paper.py` to prepare a prompt/context packet first.
 6. Generate the full Chinese translation with the current session model, or run `scripts/translate_paper.py` to prepare a prompt/context packet first.
 7. For every Chinese full translation, run `scripts/render_ocr_figures.py` whenever OCR figure placeholders are available, then produce a figure-backed Markdown translation that references the generated `figures/` assets.
@@ -84,7 +85,7 @@ python3 scripts/translate_paper.py \
 
 /tmp/papers/venv-pdf/bin/python scripts/render_ocr_figures.py \
   --pdf "/tmp/papers/archive/2401.01234/Example Paper Title.pdf" \
-  --ocr-md /tmp/papers/archive/2401.01234/ocr.md \
+  --ocr-md "/tmp/papers/archive/Example Paper Title/Example Paper Title.md" \
   --ocr-response-json /tmp/papers/archive/2401.01234/ocr_response.json \
   --output-dir /tmp/papers/rendered
 ```
@@ -99,9 +100,10 @@ Use the scripts instead of reimplementing the pipeline in prompts or ad hoc shel
 - Respect arXiv API politeness rules: keep one request stream, wait at least about 3 seconds between uncached requests, and prefer cache hits over repeated identical queries.
 - For large result sets, refine the query or request smaller slices instead of paging aggressively through thousands of results.
 - Archive before summarizing or translating so metadata and extracted text live in a predictable location.
+- Do not translate a paper by relying on the model's own background knowledge or by asking it to infer missing structure from the PDF alone.
 - When referring to an archived paper in messages, file organization guidance, or downstream notes, use the paper title as the archive name; treat the arXiv ID as metadata only.
 - Treat the original archive as “keep the source PDF”; treat the Chinese output as “keep Markdown plus figures”.
-- Prefer running `scripts/ocr_paper.py` before summary or translation when the PDF contains dense figures, formulas, tables, or multi-column layout.
+- Full-paper translation should call `scripts/ocr_paper.py` first. Only fall back to non-OCR inputs when OCR genuinely fails.
 - Chinese full translations must preserve paper figures and charts whenever the OCR output contains figure placeholders or figure regions.
 - Prefer running `scripts/render_ocr_figures.py` before finalizing any Chinese full translation, not only when the user explicitly asks for a VS Code or Obsidian friendly version.
 - Always create the Chinese summary.
@@ -123,11 +125,11 @@ Core inputs across the workflow:
 - `translation_dir`: output directory for Chinese translations
 Internal storage layout:
 
-- `archive_dir/<arxiv_id>/<english-title>.pdf`
-- `archive_dir/<arxiv_id>/metadata.json`
-- `archive_dir/<arxiv_id>/extracted_text.md`
-- `archive_dir/<arxiv_id>/ocr.md`
-- `archive_dir/<arxiv_id>/ocr_response.json`
+- `archive_dir/<english-title>/<english-title>.pdf`
+- `archive_dir/<english-title>/metadata.json`
+- `archive_dir/<english-title>/extracted_text.md`
+- `archive_dir/<english-title>/<english-title>.md`
+- `archive_dir/<english-title>/ocr_response.json`
 - `hot_dir/YYYY-MM-DD/hot_papers.json`
 - `hot_dir/YYYY-MM-DD/hot_papers.md`
 - `summary_dir/<arxiv_id>.md`
@@ -145,6 +147,7 @@ User-facing naming rule:
 - Archive the source paper by its English paper title, not by arXiv ID.
 - Save Chinese full translations by the English paper title, not by arXiv ID.
 - Treat `arXiv ID` as an internal lookup key and metadata field unless the user explicitly asks for it.
+- New archives should not create `archive_dir/<arxiv_id>/...` folders.
 
 Practical retention rule:
 
@@ -230,7 +233,7 @@ Required:
 
 ### `scripts/ocr_paper.py`
 
-Run GLM-OCR on the archived PDF and save the OCR markdown for downstream summary and translation.
+Run GLM-OCR on the archived PDF and save the OCR markdown for downstream summary and translation. The OCR Markdown file should use the paper's English title as the filename.
 
 Required:
 
@@ -281,7 +284,7 @@ Use `scripts/find_hot_papers.py` when the user says:
 
 PDF text extraction is best-effort, and GLM-OCR is the preferred high-fidelity path.
 
-- Prefer `ocr.md` when available.
+- Prefer the title-named OCR Markdown file when available.
 - Otherwise use `extracted_text.md` from local PDF parsing.
 - If both OCR and extraction fail, generate summary and translation from metadata plus arXiv abstract, and clearly say so in the output.
 - No separate API key is required for summary or translation when the current Claude Code or Codex session model is doing the writing.

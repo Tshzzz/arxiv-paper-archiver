@@ -18,8 +18,8 @@ Use this skill in Claude Code as a lightweight workflow wrapper around the bundl
 4. Trust the built-in cache and rate limiter; do not fan out concurrent manual arXiv search loops around the scripts.
 5. Pick one paper from the JSON results.
 6. Run `scripts/archive_paper.py` with `--arxiv-id`, `--query`, and `--archive-dir`.
-7. If the PDF is layout-heavy, run `scripts/ocr_paper.py` so downstream steps can use `ocr.md`.
-8. Read `ocr.md` when present, otherwise read `metadata.json` and `extracted_text.md`, then use the current Claude Code session model to write the final Chinese summary.
+7. Before doing full-paper translation, always run `scripts/ocr_paper.py`. Do not skip OCR and ask the model to translate directly from memory or rough PDF understanding.
+8. Read the title-named OCR Markdown file when present, otherwise read `metadata.json` and `extracted_text.md`, then use the current Claude Code session model to write the final Chinese summary.
 9. Read the same archive files and use the current Claude Code session model to write the final Chinese translation only when requested.
 10. When writing a Chinese full translation, treat the figure-backed Markdown version as the default deliverable. If OCR figure placeholders exist, run `scripts/render_ocr_figures.py` and keep the paired `figures/` directory.
 11. If you want a reusable handoff artifact for another workflow, run `scripts/summarize_paper.py` or `scripts/translate_paper.py` to prepare `.prompt.md` and `.context.md` files.
@@ -89,10 +89,10 @@ For arXiv search behavior:
 
 - Hot-paper reports go under `hot_dir/YYYY-MM-DD/`
 - Use `find_hot_papers.py` when you need a ranked list rather than a plain relevance search
-- Archive files go under `archive_dir/<arxiv_id>/` for internal lookup only
+- Archive files go under `archive_dir/<english-title>/`
 - The original PDF should use the paper's English title as the filename.
 - When describing or organizing archives for the user, refer to the paper by its title-based archive name rather than by the arXiv ID.
-- OCR markdown goes to `archive_dir/<arxiv_id>/ocr.md`
+- OCR markdown goes to `archive_dir/<english-title>/<english-title>.md`
 - Final summaries go to `summary_dir/<arxiv_id>.md`
 - Final translations go to `translation_dir/<english-title>.md`
 - Preferred final reading translations go to `rendered/<english-title>.translation.rendered.md`
@@ -101,7 +101,7 @@ For arXiv search behavior:
 
 User-facing naming rule:
 
-- Use English paper titles for archive names and Chinese translation filenames.
+- Use English paper titles for archive folder names and Chinese translation filenames.
 - Keep `arXiv ID` only for internal lookup, provenance, and metadata.
 
 Preferred retention model:
@@ -110,3 +110,4 @@ Preferred retention model:
 - Keep the Chinese deliverable as a figure-backed Markdown file named by the paper's English title plus `figures/`.
 
 Avoid duplicating logic in prompts. Let the scripts own the normalization, file layout, and output format.
+Do not ask the model to translate the paper “from scratch” without first calling the OCR step unless OCR has already failed and you explicitly disclose the degraded path.

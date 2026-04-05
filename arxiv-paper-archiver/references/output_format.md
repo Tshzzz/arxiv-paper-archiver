@@ -2,7 +2,7 @@
 
 ## Metadata JSON
 
-Store metadata at `archive_dir/<arxiv_id>/metadata.json`.
+Store metadata at `archive_dir/<english-title>/metadata.json`.
 
 Required fields:
 
@@ -26,14 +26,14 @@ Recommended extra fields:
 
 ## Archived Files
 
-Store archived source files under `archive_dir/<arxiv_id>/`.
+Store archived source files under `archive_dir/<english-title>/`.
 
-This `arxiv_id` path is an internal storage key for deduplication and lookup. User-facing archive naming should still follow the paper's English title.
+Use the paper's English title for the archive folder itself. Keep `arxiv_id` inside metadata for lookup and provenance.
 
 - `<english-title>.pdf`: downloaded PDF from arXiv using the paper's English title as the filename
 - `metadata.json`: normalized metadata and provenance
 - `extracted_text.md`: extracted paper text, if PDF text extraction succeeds
-- `ocr.md`: GLM-OCR markdown output, preferred when present
+- `<english-title>.md`: GLM-OCR markdown output, preferred when present
 - `ocr_response.json`: raw GLM-OCR API response for debugging and audit
 
 ## Hot Papers Report
@@ -76,7 +76,7 @@ Recommended retention policy:
 
 - Keep the original archive primarily as the title-named PDF.
 - Treat the title-named PDF as the user-facing archive name. The `arxiv_id` should remain metadata, not the visible archive label.
-- Treat `metadata.json`, `extracted_text.md`, `ocr.md`, and `ocr_response.json` as rebuildable workflow artifacts.
+- Treat `metadata.json`, `extracted_text.md`, the title-named OCR Markdown file, and `ocr_response.json` as rebuildable workflow artifacts.
 
 ## Chinese Summary Markdown
 

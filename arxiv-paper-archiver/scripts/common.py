@@ -286,14 +286,6 @@ def _extract_with_pdftotext(pdf_path: Path) -> str:
     return result.stdout.strip()
 
 
-def paper_archive_dir(archive_dir: Path, arxiv_id: str) -> Path:
-    return archive_dir / arxiv_id
-
-
-def metadata_path(archive_dir: Path, arxiv_id: str) -> Path:
-    return paper_archive_dir(archive_dir, arxiv_id) / "metadata.json"
-
-
 def sanitize_filename(value: str, max_length: int = 180) -> str:
     cleaned = re.sub(r"[\\/:*?\"<>|]+", " ", value).strip()
     cleaned = re.sub(r"\s+", " ", cleaned)
@@ -314,13 +306,55 @@ def title_stem_from_title(title: str, fallback: str = "paper") -> str:
     return cleaned or fallback
 
 
+def markdown_filename_from_title(title: str, fallback: str = "paper") -> str:
+    return f"{title_stem_from_title(title, fallback=fallback)}.md"
+
+
+def archive_dirname_from_title(title: str, fallback: str = "paper") -> str:
+    return title_stem_from_title(title, fallback=fallback)
+
+
+def _find_existing_archive_dir(archive_dir: Path, arxiv_id: str) -> Path | None:
+    legacy_dir = archive_dir / arxiv_id
+    metadata_file = legacy_dir / "metadata.json"
+    if metadata_file.exists():
+        return legacy_dir
+
+    for path in archive_dir.iterdir() if archive_dir.exists() else []:
+        if not path.is_dir():
+            continue
+        candidate = path / "metadata.json"
+        if not candidate.exists():
+            continue
+        try:
+            data = read_json(candidate)
+        except Exception:
+            continue
+        if isinstance(data, dict) and str(data.get("arxiv_id", "")).strip() == arxiv_id:
+            return path
+    return None
+
+
+def paper_archive_dir(archive_dir: Path, arxiv_id: str, title: str | None = None) -> Path:
+    if title:
+        return archive_dir / archive_dirname_from_title(title, fallback=arxiv_id)
+    resolved = _find_existing_archive_dir(archive_dir, arxiv_id)
+    if resolved is not None:
+        return resolved
+    return archive_dir / arxiv_id
+
+
+def metadata_path(archive_dir: Path, arxiv_id: str, title: str | None = None) -> Path:
+    return paper_archive_dir(archive_dir, arxiv_id, title=title) / "metadata.json"
+
+
 def pdf_path(archive_dir: Path, arxiv_id: str, title: str | None = None) -> Path:
     filename = pdf_filename_from_title(title) if title else "paper.pdf"
-    return paper_archive_dir(archive_dir, arxiv_id) / filename
+    return paper_archive_dir(archive_dir, arxiv_id, title=title) / filename
 
 
-def extracted_text_path(archive_dir: Path, arxiv_id: str) -> Path:
-    return paper_archive_dir(archive_dir, arxiv_id) / "extracted_text.md"
+def extracted_text_path(archive_dir: Path, arxiv_id: str, title: str | None = None) -> Path:
+    return paper_archive_dir(archive_dir, arxiv_id, title=title) / "extracted_text.md"
 
 
 def load_metadata(archive_dir: Path, arxiv_id: str) -> dict:
@@ -337,18 +371,33 @@ def load_source_text(archive_dir: Path, arxiv_id: str) -> str:
     ocr_path = ocr_markdown_path(archive_dir, arxiv_id)
     if ocr_path.exists():
         return ocr_path.read_text()
+    legacy_ocr = legacy_ocr_markdown_path(archive_dir, arxiv_id)
+    if legacy_ocr.exists():
+        return legacy_ocr.read_text()
     path = extracted_text_path(archive_dir, arxiv_id)
     if not path.exists():
         return ""
     return path.read_text()
 
 
-def ocr_markdown_path(archive_dir: Path, arxiv_id: str) -> Path:
-    return paper_archive_dir(archive_dir, arxiv_id) / "ocr.md"
+def ocr_markdown_path(archive_dir: Path, arxiv_id: str, title: str | None = None) -> Path:
+    archive_root = paper_archive_dir(archive_dir, arxiv_id, title=title)
+    if title:
+        return archive_root / markdown_filename_from_title(title, fallback="ocr")
+    metadata = read_json(metadata_path(archive_dir, arxiv_id))
+    if isinstance(metadata, dict):
+        resolved_title = str(metadata.get("title", "")).strip()
+        if resolved_title:
+            return archive_root / markdown_filename_from_title(resolved_title, fallback="ocr")
+    return archive_root / "ocr.md"
 
 
-def ocr_response_path(archive_dir: Path, arxiv_id: str) -> Path:
-    return paper_archive_dir(archive_dir, arxiv_id) / "ocr_response.json"
+def legacy_ocr_markdown_path(archive_dir: Path, arxiv_id: str, title: str | None = None) -> Path:
+    return paper_archive_dir(archive_dir, arxiv_id, title=title) / "ocr.md"
+
+
+def ocr_response_path(archive_dir: Path, arxiv_id: str, title: str | None = None) -> Path:
+    return paper_archive_dir(archive_dir, arxiv_id, title=title) / "ocr_response.json"
 
 
 def render_bullet_list(items: Iterable[str]) -> str:

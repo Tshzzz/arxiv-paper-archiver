@@ -21,11 +21,12 @@
 - If PDF text extraction fails, set `extraction_status` to `abstract_only`.
 - Continue summary generation based on arXiv metadata and abstract.
 - Translation should either use extracted fragments or explicitly mark the output as incomplete and abstract-based.
+- Do not compensate for missing OCR by pretending the model can faithfully reconstruct the whole paper on its own.
 
 ## OCR Failures
 
 - If GLM-OCR fails, keep the archived PDF and existing metadata.
-- Store no partial `ocr.md`; only write it when `md_results` is present.
+- Store no partial title-named OCR Markdown file; only write it when `md_results` is present.
 - Fall back to local PDF extraction and clearly note the degraded path in the final summary or translation if quality is affected.
 - If the API rejects the file size or page count, report the actual PDF size/page count and skip OCR.
 
