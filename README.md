@@ -1,6 +1,6 @@
 # ArXiv Paper Archiver
 
-把 arXiv 论文一键整理成适合中文阅读、知识归档和 AI 工作流消费的研究资料。
+把 arXiv 论文一键整理成适合中文阅读、知识归档和 AI 工作流的研究资料。
 
 主要能力：
 
@@ -12,7 +12,7 @@
 - 生成带图的中文全文翻译
 - 输出可归档、可阅读、可二次加工的 Markdown 文件
 
-## 一眼看懂的翻译 Demo
+## 基于GLM ORC的文本翻译能力
 
 - 输入：一篇英文 PDF
 - 输出：一份带图的中文 Markdown
@@ -41,21 +41,7 @@ demo/attention-is-all-you-need/
     └── figure-05-page-15.png
 ```
 
-翻译成品片段：
-
-```md
-### 摘要
-
-主流的序列转导模型通常依赖复杂的循环神经网络或卷积神经网络，并采用编码器-解码器结构。表现最好的模型往往还会通过注意力机制把编码器和解码器连接起来。本文提出了一种新的、更加简洁的网络结构 Transformer，它完全建立在注意力机制之上，彻底移除了递归和卷积。
-
-### 图 1
-
-![](./figures/figure-01-page-3.png)
-```
-
-完整展示说明见：
-
-- [demo/translation-demo.md](./demo/translation-demo.md)
+完整翻译文档：
 - [demo/attention-is-all-you-need/Attention Is All You Need.translation.rendered.md](./demo/attention-is-all-you-need/Attention%20Is%20All%20You%20Need.translation.rendered.md)
 
 ## Demo
