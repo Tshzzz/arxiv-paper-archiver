@@ -2,14 +2,7 @@
 
 把 arXiv 论文一键整理成适合中文阅读、知识归档和 AI 工作流消费的研究资料。
 
-这个 skill 面向：
-
-- 想持续跟踪 AI / LLM / Agents / 多模态论文的人
-- 想把英文论文沉淀成中文知识库的人
-- 使用 Claude Code / Codex 做研究辅助的人
-- 想把论文结果同步到 VS Code / Obsidian 的人
-
-它不是一个普通的“论文搜索脚本”，而是一条完整工作流：
+主要能力：
 
 - 搜索论文
 - 发现某个方向的热门论文
@@ -21,32 +14,31 @@
 
 ## 一眼看懂的翻译 Demo
 
-如果你只想判断这件事值不值得装，先看这个最小示例：
-
 - 输入：一篇英文 PDF
 - 输出：一份带图的中文 Markdown
 
 示例论文：
 
-- `An Empirical Study of Multi-Agent Collaboration for Automated Research`
+- `Attention Is All You Need`
 
 输入文件：
 
 ```text
-archive/
-└── An Empirical Study of Multi-Agent Collaboration for Automated Research/
-    └── An Empirical Study of Multi-Agent Collaboration for Automated Research.pdf
+demo/attention-is-all-you-need/
+└── Attention Is All You Need.pdf
 ```
 
 输出文件：
 
 ```text
-rendered/
-├── An Empirical Study of Multi-Agent Collaboration for Automated Research.translation.rendered.md
+demo/attention-is-all-you-need/
+├── Attention Is All You Need.translation.rendered.md
 └── figures/
-    ├── figure-01-page-5.png
-    ├── figure-02-page-10.png
-    └── figure-03-page-11.png
+    ├── figure-01-page-3.png
+    ├── figure-02-page-4.png
+    ├── figure-03-page-13.png
+    ├── figure-04-page-14.png
+    └── figure-05-page-15.png
 ```
 
 翻译成品片段：
@@ -54,16 +46,17 @@ rendered/
 ```md
 ### 摘要
 
-随着 AI agents 的不断发展，研究社区正迅速从单一大语言模型（LLM）转向多智能体系统（Multi-Agent Systems, MAS），以突破自动化研究中的认知瓶颈。然而，这些自治智能体究竟应当采用何种最优的多智能体协作框架，目前仍缺乏系统研究。
+主流的序列转导模型通常依赖复杂的循环神经网络或卷积神经网络，并采用编码器-解码器结构。表现最好的模型往往还会通过注意力机制把编码器和解码器连接起来。本文提出了一种新的、更加简洁的网络结构 Transformer，它完全建立在注意力机制之上，彻底移除了递归和卷积。
 
 ### 图 1
 
-![](./figures/figure-01-page-5.png)
+![](./figures/figure-01-page-3.png)
 ```
 
 完整展示说明见：
 
 - [demo/translation-demo.md](./demo/translation-demo.md)
+- [demo/attention-is-all-you-need/Attention Is All You Need.translation.rendered.md](./demo/attention-is-all-you-need/Attention%20Is%20All%20You%20Need.translation.rendered.md)
 
 ## Demo
 
@@ -76,87 +69,25 @@ rendered/
 你最终可以得到：
 
 ```text
-archive/
-└── An Empirical Study of Multi-Agent Collaboration for Automated Research/
-    ├── An Empirical Study of Multi-Agent Collaboration for Automated Research.pdf
-    ├── An Empirical Study of Multi-Agent Collaboration for Automated Research.md
-    ├── metadata.json
-    └── ocr_response.json
-
-summaries/
-└── An Empirical Study of Multi-Agent Collaboration for Automated Research.md
-
-translations/
-└── An Empirical Study of Multi-Agent Collaboration for Automated Research.md
-
-rendered/
-├── An Empirical Study of Multi-Agent Collaboration for Automated Research.translation.rendered.md
+demo/attention-is-all-you-need/
+├── Attention Is All You Need.pdf
+├── Attention Is All You Need.translation.rendered.md
 └── figures/
 ```
 
 也就是说，它会把“论文链接”变成：
 
 - 原始 PDF
-- OCR 结构化文本
-- 中文摘要
 - 带图中文全文
 - 可直接放进知识库的 Markdown 产物
 
-## 为什么这个 skill 更好用
+## 工作流特性
 
-### 1. 不只是搜索，而是完整论文工作流
-
-很多工具只能帮你“找到论文”。
-
-这个 skill 解决的是从“找到论文”到“真正可读、可存、可复用”的整条链路。
-
-### 2. 默认按英文论文标题命名
-
-不是把文件堆成：
-
-- `2508.16598.pdf`
-- `2508.16598.md`
-
-而是统一按论文英文标题保存，更适合人类阅读和长期归档。
-
-### 3. 翻译前强制走 OCR
-
-这套 skill 明确要求：
-
-- 全文翻译前必须先调用 `GLM-OCR`
-- 不能跳过 OCR 直接让模型“凭自己理解翻”
-
-这样能明显改善：
-
-- 章节结构
-- 图表说明
-- 多栏论文排版
-- 表格与公式上下文
-
-### 4. 中文翻译默认带图
-
-只要 OCR 能识别到 figure placeholder 或图片区：
-
-- 中文全文翻译默认就要保留图表
-- 不是只输出纯文字 Markdown
-
-这点非常适合：
-
-- VS Code 阅读
-- Obsidian 知识库
-- 团队内部研究归档
-
-### 5. 同时适配 Claude Code / Codex
-
-它既可以作为：
-
-- Codex skill
-
-也可以作为：
-
-- Claude Code 的脚本工具包 + 工作流规范
-
-不需要你维护两套逻辑。
+- 默认按英文论文标题命名 PDF、OCR Markdown、摘要和翻译文件
+- 全文翻译前默认先跑 `GLM-OCR`
+- 中文全文翻译默认保留图表
+- 支持输出带图的 Markdown，适合 VS Code 和 Obsidian
+- 同时支持 Codex skill 和 Claude Code 脚本工作流
 
 ## 核心能力
 
@@ -250,6 +181,7 @@ python3.12 scripts/render_ocr_figures.py \
 
 - 全文翻译前必须先跑 `ocr_paper.py`
 - 不要跳过 OCR 直接让模型自己翻整篇论文
+- 默认应输出完整翻译，不应只翻译部分章节或只给压缩版概述
 - OCR 失败时才能走降级路径
 
 ### 图表规则
@@ -340,15 +272,6 @@ paper_skills/
 - `summarize_paper.py`: 生成摘要上下文包
 - `translate_paper.py`: 生成翻译上下文包
 - `render_ocr_figures.py`: 生成带图 Markdown
-
-## 适合谁用
-
-如果你符合下面任意一种场景，这个 skill 就很适合你：
-
-- 你想持续追踪某个 AI 子方向的论文
-- 你想把英文论文沉淀成中文知识库
-- 你想让 Claude Code / Codex 帮你自动整理论文
-- 你想把论文导入 Obsidian 或 VS Code 做长期阅读
 
 ## 相关文档
 

@@ -5,7 +5,7 @@ description: Search arXiv by topic or keyword, discover top-N hot papers for an 
 
 # ArXiv Paper Archiver
 
-Archive arXiv papers into a stable local directory layout, keep the original PDF using the paper's English title as the filename, and treat the paper title as the archive name from the user's point of view rather than using the arXiv ID as the visible archive label. Run GLM-OCR on the archived PDF before paper translation work so the agent works from a structured document source instead of translating from its own memory or rough PDF text extraction. Discover the hottest papers for a research topic, then use the current Claude Code or Codex session model to generate a Chinese summary and an optional full Chinese translation. Chinese translations must include the paper's figures and charts as renderable Markdown assets whenever OCR placeholders or figure regions are available. Use the bundled scripts for search, hot-paper discovery, archive, OCR, and prompt/context preparation.
+Archive arXiv papers into a stable local directory layout, keep the original PDF using the paper's English title as the filename, and treat the paper title as the archive name from the user's point of view rather than using the arXiv ID as the visible archive label. Run GLM-OCR on the archived PDF before paper translation work so the agent works from a structured document source instead of translating from its own memory or rough PDF text extraction. Discover the hottest papers for a research topic, then use the current Claude Code or Codex session model to generate a Chinese summary and an optional full Chinese translation. Full-paper Chinese translation means translating the complete available paper content in original order rather than returning only a subset of sections or a compressed overview unless a degraded fallback is explicitly disclosed. Chinese translations must include the paper's figures and charts as renderable Markdown assets whenever OCR placeholders or figure regions are available. Use the bundled scripts for search, hot-paper discovery, archive, OCR, and prompt/context preparation.
 
 ## Core Capabilities
 
@@ -18,6 +18,7 @@ This skill gives the current AI agent a reusable paper-processing workflow with 
 - Present archived papers to users by paper title, not by arXiv ID.
 - Run GLM-OCR on the archived PDF so the agent can work from layout-aware Markdown instead of plain text extraction.
 - Require OCR as the default prerequisite for full-paper translation; do not rely on the model to freestyle or reconstruct the paper directly from the raw PDF or from memory.
+- Treat full-paper translation as a completeness requirement: translate the paper fully when OCR text is available, not just selected highlights.
 - Prepare `.context.md` and `.prompt.md` packets so the current Claude Code or Codex session can write high-quality Chinese summaries and translations without embedding all workflow logic in the prompt.
 - Prefer OCR output over plain extracted text when generating downstream summary or translation context.
 - Render OCR figure placeholders into real PNG assets and a Markdown copy that VS Code or Obsidian can preview with inline images.
@@ -45,7 +46,7 @@ Run the workflow in this order:
 3. Archive the paper with `scripts/archive_paper.py`.
 4. Before translating a paper, run `scripts/ocr_paper.py` on the archived PDF so the translation is grounded in OCR output.
 5. Generate the Chinese summary with the current session model, or run `scripts/summarize_paper.py` to prepare a prompt/context packet first.
-6. Generate the full Chinese translation with the current session model, or run `scripts/translate_paper.py` to prepare a prompt/context packet first.
+6. Generate the full Chinese translation with the current session model, or run `scripts/translate_paper.py` to prepare a prompt/context packet first. A full translation should cover the whole paper content available from OCR, not only the abstract, intro, or chosen sections.
 7. For every Chinese full translation, run `scripts/render_ocr_figures.py` whenever OCR figure placeholders are available, then produce a figure-backed Markdown translation that references the generated `figures/` assets.
 8. When you need editor-friendly figure rendering for the OCR source itself, run `scripts/render_ocr_figures.py` to replace OCR figure placeholders with real PNG files and a Markdown copy.
 
@@ -104,7 +105,9 @@ Use the scripts instead of reimplementing the pipeline in prompts or ad hoc shel
 - When referring to an archived paper in messages, file organization guidance, or downstream notes, use the paper title as the archive name; treat the arXiv ID as metadata only.
 - Treat the original archive as “keep the source PDF”; treat the Chinese output as “keep Markdown plus figures”.
 - Full-paper translation should call `scripts/ocr_paper.py` first. Only fall back to non-OCR inputs when OCR genuinely fails.
+- Do not silently compress a requested paper translation into a shortened reading note or demo excerpt.
 - Chinese full translations must preserve paper figures and charts whenever the OCR output contains figure placeholders or figure regions.
+- If context limits or OCR loss force a shortened translation, mark it clearly as partial and list omitted sections.
 - Prefer running `scripts/render_ocr_figures.py` before finalizing any Chinese full translation, not only when the user explicitly asks for a VS Code or Obsidian friendly version.
 - Always create the Chinese summary.
 - Only create the full translation when the user explicitly asks for it or asks for a Chinese full-text version.

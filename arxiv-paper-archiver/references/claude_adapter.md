@@ -22,7 +22,8 @@ Use this skill in Claude Code as a lightweight workflow wrapper around the bundl
 8. Read the title-named OCR Markdown file when present, otherwise read `metadata.json` and `extracted_text.md`, then use the current Claude Code session model to write the final Chinese summary.
 9. Read the same archive files and use the current Claude Code session model to write the final Chinese translation only when requested.
 10. When writing a Chinese full translation, treat the figure-backed Markdown version as the default deliverable. If OCR figure placeholders exist, run `scripts/render_ocr_figures.py` and keep the paired `figures/` directory.
-11. If you want a reusable handoff artifact for another workflow, run `scripts/summarize_paper.py` or `scripts/translate_paper.py` to prepare `.prompt.md` and `.context.md` files.
+11. When the user asks for a paper translation, default to a complete translation of the paper content in original order. Do not silently reduce it to the abstract, introduction, method summary, or selected highlights.
+12. If you want a reusable handoff artifact for another workflow, run `scripts/summarize_paper.py` or `scripts/translate_paper.py` to prepare `.prompt.md` and `.context.md` files.
 
 ## Example Commands
 
@@ -111,3 +112,4 @@ Preferred retention model:
 
 Avoid duplicating logic in prompts. Let the scripts own the normalization, file layout, and output format.
 Do not ask the model to translate the paper “from scratch” without first calling the OCR step unless OCR has already failed and you explicitly disclose the degraded path.
+Treat a complete translation as the default deliverable. If you must shorten it, mark the file partial and list omitted sections.

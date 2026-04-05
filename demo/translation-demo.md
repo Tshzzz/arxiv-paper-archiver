@@ -1,24 +1,23 @@
 # PDF -> 中文 Markdown Demo
 
-这个 demo 用来展示这套 skill 最直观的一项能力：
+这个 demo 展示一条最小翻译链路：
 
 - 输入一篇英文论文 PDF
 - 输出一份适合 VS Code / Obsidian 阅读的带图中文 Markdown
 
 ## 示例论文
 
-- 论文标题：`An Empirical Study of Multi-Agent Collaboration for Automated Research`
+- 论文标题：`Attention Is All You Need`
 - 论文来源：arXiv
-- 方向：AI agents / multi-agent systems / automated research
+- 方向：Transformer / machine translation / attention
 
 ## 输入
 
-归档目录中的原始 PDF：
+精简后的 demo 目录里直接保留原始 PDF：
 
 ```text
-archive/
-└── An Empirical Study of Multi-Agent Collaboration for Automated Research/
-    └── An Empirical Study of Multi-Agent Collaboration for Automated Research.pdf
+demo/attention-is-all-you-need/
+└── Attention Is All You Need.pdf
 ```
 
 ## 输出
@@ -32,12 +31,14 @@ archive/
 结构示意：
 
 ```text
-rendered/
-├── An Empirical Study of Multi-Agent Collaboration for Automated Research.translation.rendered.md
+demo/attention-is-all-you-need/
+├── Attention Is All You Need.translation.rendered.md
 └── figures/
-    ├── figure-01-page-5.png
-    ├── figure-02-page-10.png
-    └── figure-03-page-11.png
+    ├── figure-01-page-3.png
+    ├── figure-02-page-4.png
+    ├── figure-03-page-13.png
+    ├── figure-04-page-14.png
+    └── figure-05-page-15.png
 ```
 
 ## 中文翻译效果示例
@@ -45,29 +46,27 @@ rendered/
 下面是一小段真实风格的输出片段：
 
 ```md
-# 多智能体协作在自动化研究中的实证研究
+# 注意力就是你所需要的一切
 
 ## 翻译说明
 
-本文中文稿基于论文的 GLM-OCR 结果整理翻译，整体覆盖了标题、摘要、引言、相关工作、方法、实验结果、结论和主要图表说明。
+本文中文稿基于 GLM-OCR 结果整理翻译。OCR 结果保留了标题、章节结构、公式、表格和主要图片位置，因此这一版更接近论文原始排版。
 
 ### 摘要
 
-随着 AI agents 的不断发展，研究社区正迅速从单一大语言模型（LLM）转向多智能体系统（Multi-Agent Systems, MAS），以突破自动化研究中的认知瓶颈。
+主流的序列转导模型通常依赖复杂的循环神经网络或卷积神经网络，并采用编码器-解码器结构。表现最好的模型往往还会通过注意力机制把编码器和解码器连接起来。本文提出了一种新的、更加简洁的网络结构 Transformer，它完全建立在注意力机制之上，彻底移除了递归和卷积。
 
 ### 图 1
 
-![](./figures/figure-01-page-5.png)
+![](./figures/figure-01-page-3.png)
 ```
 
-## 为什么这个 Demo 有说服力
-
-它展示的不是“模型会翻译一句话”，而是这套 skill 的完整交付能力：
+## Demo 内容
 
 - 原始 PDF 会被保留
 - 翻译前先走 OCR，而不是让模型直接脑补整篇论文
 - 中文全文默认保留图表
-- 输出结果是长期可归档的 Markdown，而不是一次性聊天记录
+- demo 目录最终可以精简成只保留 PDF、带图中文稿和 `figures/`
 
 ## 如何复现
 
@@ -75,35 +74,33 @@ rendered/
 
 ```bash
 python3.12 scripts/archive_paper.py \
-  --arxiv-id 2603.29632v1 \
-  --query "ai agents" \
+  --arxiv-id 1706.03762v7 \
+  --query "Attention Is All You Need" \
   --archive-dir /tmp/papers/archive
 ```
 
 ```bash
 python3.12 scripts/ocr_paper.py \
-  --arxiv-id 2603.29632v1 \
+  --arxiv-id 1706.03762v7 \
   --archive-dir /tmp/papers/archive
 ```
 
 ```bash
 python3.12 scripts/translate_paper.py \
-  --arxiv-id 2603.29632v1 \
+  --arxiv-id 1706.03762v7 \
   --archive-dir /tmp/papers/archive \
   --translation-dir /tmp/papers/translations
 ```
 
 ```bash
 python3.12 scripts/render_ocr_figures.py \
-  --pdf "/tmp/papers/archive/An Empirical Study of Multi-Agent Collaboration for Automated Research/An Empirical Study of Multi-Agent Collaboration for Automated Research.pdf" \
-  --ocr-md "/tmp/papers/archive/An Empirical Study of Multi-Agent Collaboration for Automated Research/An Empirical Study of Multi-Agent Collaboration for Automated Research.md" \
-  --ocr-response-json "/tmp/papers/archive/An Empirical Study of Multi-Agent Collaboration for Automated Research/ocr_response.json" \
+  --pdf "/tmp/papers/archive/Attention Is All You Need/Attention Is All You Need.pdf" \
+  --ocr-md "/tmp/papers/archive/Attention Is All You Need/Attention Is All You Need.md" \
+  --ocr-response-json "/tmp/papers/archive/Attention Is All You Need/ocr_response.json" \
   --output-dir /tmp/papers/rendered
 ```
 
-## 适合放在哪里展示
-
-这个 demo 很适合放在：
+## 可展示位置
 
 - GitHub 首页 README
 - 发布帖的第一张图或第一段说明

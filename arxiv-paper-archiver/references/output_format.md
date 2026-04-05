@@ -123,10 +123,13 @@ Use this exact section order:
 5. `## 专有名词保留策略`
 6. `## 术语对照表`
 
+Default expectation: the final Chinese translation should be complete and preserve the original section order as much as possible. Do not present a shortened demo translation as the final full-paper deliverable.
+
 If translation is interrupted, keep the partial file and add a clear note under `## 翻译说明`.
 
 Figure requirement:
 
 - A Chinese full translation should preserve paper figures and charts whenever OCR output contains figure placeholders or detectable figure regions.
+- A Chinese full translation should include the whole available paper content, including later sections, tables, appendix explanations, and references when they are present in OCR output.
 - The final translation handoff should include both the English-title Markdown file and the `figures/` directory needed to render inline images.
 - Do not present the translation deliverable to users as an `arXiv ID`-named file.

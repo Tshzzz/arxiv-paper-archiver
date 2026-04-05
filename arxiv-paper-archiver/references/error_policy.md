@@ -35,6 +35,7 @@
 - If the current agent cannot finish the Chinese summary or translation in one pass, keep the prepared `.prompt.md` and `.context.md` files so the task can be retried.
 - If the current agent context window is too small for the extracted text, translate the most important sections first and say which sections were skipped.
 - Do not claim a file is a full translation if it only covers fragments.
+- A shortened translation is a degraded fallback only, not normal behavior for a requested paper translation.
 
 ## Idempotency
 
