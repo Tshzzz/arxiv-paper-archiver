@@ -132,10 +132,10 @@ Internal storage layout:
 - `archive_dir/<english-title>/ocr_response.json`
 - `hot_dir/YYYY-MM-DD/hot_papers.json`
 - `hot_dir/YYYY-MM-DD/hot_papers.md`
-- `summary_dir/<arxiv_id>.md`
+- `summary_dir/<english-title>.md`
 - `translation_dir/<english-title>.md`
-- `summary_dir/<arxiv_id>.context.md`
-- `summary_dir/<arxiv_id>.prompt.md`
+- `summary_dir/<english-title>.context.md`
+- `summary_dir/<english-title>.prompt.md`
 - `translation_dir/<english-title>.context.md`
 - `translation_dir/<english-title>.prompt.md`
 - `rendered/figures/*.png`
@@ -145,6 +145,7 @@ Internal storage layout:
 User-facing naming rule:
 
 - Archive the source paper by its English paper title, not by arXiv ID.
+- Save Chinese summaries by the English paper title, not by arXiv ID.
 - Save Chinese full translations by the English paper title, not by arXiv ID.
 - Treat `arXiv ID` as an internal lookup key and metadata field unless the user explicitly asks for it.
 - New archives should not create `archive_dir/<arxiv_id>/...` folders.

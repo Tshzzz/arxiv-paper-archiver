@@ -13,6 +13,7 @@ from common import (
     load_metadata,
     load_source_text,
     safe_mkdir,
+    title_stem_from_title,
 )
 
 
@@ -28,9 +29,10 @@ def main() -> None:
     metadata = load_metadata(args.archive_dir, args.arxiv_id)
     source_text = load_source_text(args.archive_dir, args.arxiv_id)
     safe_mkdir(args.summary_dir)
-    output_path = args.summary_dir / f"{args.arxiv_id}.md"
-    context_path = args.summary_dir / f"{args.arxiv_id}.context.md"
-    prompt_path = args.summary_dir / f"{args.arxiv_id}.prompt.md"
+    title_stem = title_stem_from_title(str(metadata.get("title", "")).strip(), fallback=args.arxiv_id)
+    output_path = args.summary_dir / f"{title_stem}.md"
+    context_path = args.summary_dir / f"{title_stem}.context.md"
+    prompt_path = args.summary_dir / f"{title_stem}.prompt.md"
     context_path.write_text(build_paper_context(metadata, source_text).rstrip() + "\n")
     prompt_path.write_text(
         compose_summary_prompt(metadata, output_path, context_path).rstrip() + "\n"
@@ -39,6 +41,7 @@ def main() -> None:
         json.dumps(
             {
                 "arxiv_id": args.arxiv_id,
+                "title_stem": title_stem,
                 "target_output": str(output_path),
                 "context_path": str(context_path),
                 "prompt_path": str(prompt_path),

@@ -93,7 +93,7 @@ For arXiv search behavior:
 - The original PDF should use the paper's English title as the filename.
 - When describing or organizing archives for the user, refer to the paper by its title-based archive name rather than by the arXiv ID.
 - OCR markdown goes to `archive_dir/<english-title>/<english-title>.md`
-- Final summaries go to `summary_dir/<arxiv_id>.md`
+- Final summaries go to `summary_dir/<english-title>.md`
 - Final translations go to `translation_dir/<english-title>.md`
 - Preferred final reading translations go to `rendered/<english-title>.translation.rendered.md`
 - Figure assets for Chinese translations go to `rendered/figures/`
@@ -101,7 +101,7 @@ For arXiv search behavior:
 
 User-facing naming rule:
 
-- Use English paper titles for archive folder names and Chinese translation filenames.
+- Use English paper titles for archive folder names, Chinese summary filenames, and Chinese translation filenames.
 - Keep `arXiv ID` only for internal lookup, provenance, and metadata.
 
 Preferred retention model:

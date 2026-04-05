@@ -80,11 +80,11 @@ Recommended retention policy:
 
 ## Chinese Summary Markdown
 
-Store summaries at `summary_dir/<arxiv_id>.md`.
+Store summaries at `summary_dir/<english-title>.md`.
 Optional prep artifacts:
 
-- `summary_dir/<arxiv_id>.context.md`
-- `summary_dir/<arxiv_id>.prompt.md`
+- `summary_dir/<english-title>.context.md`
+- `summary_dir/<english-title>.prompt.md`
 
 Use this exact section order:
 
