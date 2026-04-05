@@ -30,27 +30,28 @@
 
 ## 2. 目录结构
 
-skill 目录结构如下：
+仓库目录结构如下：
 
 ```text
-arxiv-paper-archiver/
-├── SKILL.md
+paper_skills/
 ├── README.md
-├── agents/
-│   └── openai.yaml
-├── references/
-│   ├── claude_adapter.md
-│   ├── error_policy.md
-│   └── output_format.md
-└── scripts/
-    ├── archive_paper.py
-    ├── common.py
-    ├── find_hot_papers.py
-    ├── ocr_paper.py
-    ├── render_ocr_figures.py
-    ├── search_arxiv.py
-    ├── summarize_paper.py
-    └── translate_paper.py
+└── arxiv-paper-archiver/
+    ├── SKILL.md
+    ├── agents/
+    │   └── openai.yaml
+    ├── references/
+    │   ├── claude_adapter.md
+    │   ├── error_policy.md
+    │   └── output_format.md
+    └── scripts/
+        ├── archive_paper.py
+        ├── common.py
+        ├── find_hot_papers.py
+        ├── ocr_paper.py
+        ├── render_ocr_figures.py
+        ├── search_arxiv.py
+        ├── summarize_paper.py
+        └── translate_paper.py
 ```
 
 ## 3. 命名规则
@@ -172,6 +173,8 @@ export ARXIV_MAX_RETRIES=3
 
 ## 6. 常见使用流程
 
+以下命令默认在 `arxiv-paper-archiver/` 目录下执行。
+
 ### 6.1 搜索论文
 
 ```bash
@@ -249,8 +252,8 @@ python3.12 scripts/render_ocr_figures.py \
 
 具体说明见：
 
-- [SKILL.md](./SKILL.md)
-- [references/claude_adapter.md](./references/claude_adapter.md)
+- [SKILL.md](./arxiv-paper-archiver/SKILL.md)
+- [references/claude_adapter.md](./arxiv-paper-archiver/references/claude_adapter.md)
 
 Claude Code 工作流建议：
 
@@ -266,11 +269,11 @@ Claude Code 工作流建议：
 
 相关元数据在：
 
-- [agents/openai.yaml](./agents/openai.yaml)
+- [agents/openai.yaml](./arxiv-paper-archiver/agents/openai.yaml)
 
 Codex 应该优先遵循：
 
-- [SKILL.md](./SKILL.md)
+- [SKILL.md](./arxiv-paper-archiver/SKILL.md)
 
 ## 9. 主要脚本说明
 
@@ -328,7 +331,7 @@ Codex 应该优先遵循：
 
 ## 12. 相关文档
 
-- [SKILL.md](./SKILL.md)
-- [references/claude_adapter.md](./references/claude_adapter.md)
-- [references/output_format.md](./references/output_format.md)
-- [references/error_policy.md](./references/error_policy.md)
+- [SKILL.md](./arxiv-paper-archiver/SKILL.md)
+- [references/claude_adapter.md](./arxiv-paper-archiver/references/claude_adapter.md)
+- [references/output_format.md](./arxiv-paper-archiver/references/output_format.md)
+- [references/error_policy.md](./arxiv-paper-archiver/references/error_policy.md)
